@@ -1,13 +1,12 @@
 from django.urls import path
-from rest_framework import routers
-from .views import ChatViewSet, MessageViewSet
 
 from . import views
 
 
-router = routers.DefaultRouter()
-router.register(r"chats", ChatViewSet)
-router.register(r"messages", MessageViewSet)
 
-urlpatterns = [path("", views.index, name="index")]
-urlpatterns += router.urls
+urlpatterns = [
+    path("", views.index, name="index"),
+    path("login/", views.login_view, name="login"),
+    path("register/", views.register_view, name="register"),
+    path("logout/", views.logout_view, name="logout"),
+]

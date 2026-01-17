@@ -1,30 +1,34 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Chat</title>
-</head>
-<body>
-  <h2>Simple Chat</h2>
+<h2>Global Chat</h2>
 
-  <input id="messageInput" type="text" placeholder="Type message">
+<p>
+ Logged as: <b>{{ request.user.username }}</b> |
+ <a href="/logout/">Logout</a>
+</p>
+
+<input id="messageInput">
 <button onclick="sendMessage()">Send</button>
+
 <ul id="chatLog"></ul>
 
 <script>
-const socket = new WebSocket("ws://127.0.0.1:8000/ws/chat/");
-socket.onmessage = e => {
+const socket = new WebSocket("ws://" + window.location.host + "/ws/chat/");
+
+socket.onmessage = function(e) {
     const data = JSON.parse(e.data);
+
     const li = document.createElement("li");
-    li.textContent = data.message;
+    li.innerHTML = "<b>" + data.username + ":</b> " + data.message;
+
     document.getElementById("chatLog").appendChild(li);
-};
+}
+
 function sendMessage() {
     const input = document.getElementById("messageInput");
-    socket.send(JSON.stringify({message: input.value}));
+
+    socket.send(JSON.stringify({
+        message: input.value
+    }));
+
     input.value = "";
 }
 </script>
-
-</body>
-</html>
