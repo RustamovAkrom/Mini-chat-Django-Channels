@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+
+<div class="header">
+
+ <div class="header-left">
+
+ {% for u in chat.participants.all %}
+ {% if u != request.user %}
+
+ <div class="username">{{ u.username }}</div>
+
+ <div class="status">
+
+ <span id="unreadBadge" class="badge">0</span>
+
+ {% if u.profile.online %}
+ 🟢 online
+ {% else %}
+ last seen {{ u.profile.last_seen|date:"H:i" }}
+ {% endif %}
+
+ </div>
+
+ {% endif %}
+ {% endfor %}
+
+ </div>
+
+ <div>
+ <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+ <a href="/">←</a>
+ </div>
+
+</div>
+
+<div id="typing"></div>
+
+<div id="chat-box">
+
+{% for msg in messages %}
+
+<div class="message {% if msg.sender == request.user %}me{% else %}other{% endif %}">
+<div class="sender">
+{% if msg.sender == request.user %}You{% else %}{{ msg.sender.username }}{% endif %}
+</div>
+
+{% if msg.is_deleted %}
+<i>Deleted</i>
+
+{% elif msg.file %}
+<a href="{{ msg.file.url }}">📎 {{ msg.file.name }}</a>
+
+{% elif msg.audio %}
+<audio class="audio" controls src="{{ msg.audio.url }}"></audio>
+
+{% else %}
+{{ msg.text }}
+{% endif %}
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<div class="bottom">
+
+<input id="messageInput" placeholder="Message...">
+
+<button class="icon-btn" onclick="document.getElementById('fileInput').click()">📎</button>
+<input type="file" id="fileInput" onchange="sendFile()">
+
+<button class="icon-btn" onclick="recordVoice()">🎤</button>
+<button class="send-btn" onclick="sendMessage()">➤</button>
+
+</div>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+ initChat("{{ chat.id }}","{{ request.user.username }}","{{ csrf_token }}");
+});
+</script>
+
+{% endblock %}

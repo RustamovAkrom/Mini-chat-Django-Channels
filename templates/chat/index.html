@@ -1,34 +1,162 @@
-<h2>Global Chat</h2>
+{% extends "base.html" %}
+{% load static %}
 
-<p>
- Logged as: <b>{{ request.user.username }}</b> |
- <a href="/logout/">Logout</a>
+{% block title %}Mini Telegram{% endblock %}
+
+{% block content %}
+
+<div class="tg-layout">
+
+<!-- ================= SIDEBAR ================= -->
+
+<div class="sidebar">
+
+<!-- TOP BAR -->
+
+<div class="sidebar-top">
+
+<div class="sidebar-user">
+
+<button class="icon-btn" onclick="toggleProfile()">☰</button>
+
+<span class="sidebar-title">Mini Telegram</span>
+
+</div>
+
+<form method="get" class="search-box">
+<input name="q" placeholder="Search users or groups..." autocomplete="off">
+</form>
+
+</div>
+
+<!-- ROOMS -->
+
+<div class="chat-list">
+
+{% if users or groups %}
+
+<div class="rooms-section-title">Search results</div>
+
+{% for u in users %}
+<a href="/start/{{ u.username }}/" class="chat-item">
+
+<div class="chat-avatar">👤</div>
+
+<div class="chat-info">
+<b>{{ u.username }}</b>
+<span class="last-msg">Start private chat</span>
+</div>
+
+</a>
+{% endfor %}
+
+{% for g in groups %}
+<a href="/chat/{{ g.id }}/" class="chat-item">
+
+<div class="chat-avatar">👥</div>
+
+<div class="chat-info">
+<b>{{ g.name }}</b>
+<span class="last-msg">Open group</span>
+</div>
+
+</a>
+{% endfor %}
+
+{% else %}
+
+<div class="rooms-section-title">Chats</div>
+
+{% for chat in chats %}
+
+<a href="/chat/{{ chat.id }}/"
+ class="chat-item {% if request.path == '/chat/'|add:chat.id|stringformat:'s' %}active{% endif %}">
+
+<div class="chat-avatar">
+{% if chat.type == "group" %}👥{% else %}👤{% endif %}
+</div>
+
+<div class="chat-info">
+
+{% if chat.type == "group" %}
+<b>{{ chat.name }}</b>
+{% else %}
+<b>Private Chat</b>
+{% endif %}
+
+<span class="last-msg">
+{{ chat.messages.last.text|default:"No messages yet"|truncatechars:30 }}
+</span>
+
+</div>
+
+</a>
+
+{% empty %}
+
+<div class="empty-sidebar">
+No chats yet 😢<br>
+Use search to start chatting
+</div>
+
+{% endfor %}
+
+{% endif %}
+
+</div>
+
+</div>
+
+<!-- ================= MAIN ================= -->
+
+<div class="main-window">
+
+<div class="empty-chat">
+💬 Select a chat to start messaging
+</div>
+
+</div>
+
+<!-- ================= PROFILE DRAWER ================= -->
+
+<div id="profileOverlay" class="profile-overlay" onclick="closeProfile()"></div>
+
+<div id="profileDrawer" class="profile-drawer">
+
+<!-- CLOSE BUTTON -->
+<button class="profile-close" onclick="closeProfile()">✕</button>
+
+<div class="profile-header">
+
+<div class="profile-avatar">
+    {% if request.user.profile.avatar %}
+    <img src="{{ request.user.profile.avatar.url }}" alt="" width="100" height="100" style="border-radius: 50px;">
+    {% else %}
+    🥷
+    {% endif %}
+</div>
+
+<h3>{{ request.user.username }}</h3>
+
+</div>
+
+<p class="profile-bio">
+{{ request.user.profile.bio|default:"No bio yet" }}
 </p>
 
-<input id="messageInput">
-<button onclick="sendMessage()">Send</button>
+<div class="profile-actions">
 
-<ul id="chatLog"></ul>
+<a href="/profile/avatar/">🖼 Change avatar</a>
 
-<script>
-const socket = new WebSocket("ws://" + window.location.host + "/ws/chat/");
+<a href="/create-group/">➕ Create group</a>
 
-socket.onmessage = function(e) {
-    const data = JSON.parse(e.data);
+<a href="/logout/">🚪 Logout</a>
 
-    const li = document.createElement("li");
-    li.innerHTML = "<b>" + data.username + ":</b> " + data.message;
+</div>
 
-    document.getElementById("chatLog").appendChild(li);
-}
+</div>
 
-function sendMessage() {
-    const input = document.getElementById("messageInput");
 
-    socket.send(JSON.stringify({
-        message: input.value
-    }));
+</div>
 
-    input.value = "";
-}
-</script>
+{% endblock %}

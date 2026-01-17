@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<title>{% block title %}Mini Telegram{% endblock %}</title>
+
+<link rel="stylesheet" href="{% static 'chat/css/chat.css' %}">
+
+{% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+{% block content %}{% endblock %}
+
+<script src="{% static 'chat/js/chat.js' %}"></script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

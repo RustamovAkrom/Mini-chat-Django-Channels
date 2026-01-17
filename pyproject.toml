@@ -11,4 +11,5 @@ dependencies = [
     "django>=6.0",
     "django-restframework>=0.0.1",
     "djangorestframework>=3.16.1",
+    "pillow>=12.1.0",
 ]

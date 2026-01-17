@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Change avatar</h3>
+
+<form method="POST" enctype="multipart/form-data">
+
+  {% csrf_token %}
+
+  <input type="file" name="avatar" required>
+
+  <br><br>
+
+  <button>Upload</button>
+
+</form>
+
+<a href="/">← Back</a>
+
+{% endblock %}
